@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/7e574780-0f87-42e8-af8c-5e8cb7d3540a/resourceGroups/my-grpc-rg/providers/Microsoft.Web/sites/my-node-grpc-express-app",
+    "appService.deploySubpath": "ExpressApp1"
+}

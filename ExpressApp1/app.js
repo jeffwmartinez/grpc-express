@@ -12,6 +12,37 @@ var users = require('./routes/users');
 
 var app = express();
 
+// var portgRPC2 = process.env.PORT || 8181
+
+// // http2express // revert
+var http2 = require('http2')
+var fs = require('fs')
+
+// // adding certificate options // revert?
+// var server2 = http2.createSecureServer({
+//     key: fs.readFileSync('./nodelocalhost-privkey.pem'),
+//     cert: fs.readFileSync('./node_modules/localhost-cert.pem')
+//   });
+
+//   server2.on('error', (err) => console.error(err));
+  
+//   server2.on('stream', (stream, headers) => {
+//     // stream is a Duplex
+//     stream.respond({
+//       'content-type': 'text/html; charset=utf-8',
+//       ':status': 200
+//     });
+//     stream.end('<h1>Hello World</h1>');
+//   });
+
+//   server2.listen(8181)
+  
+var server2 = http2.createServer()
+
+
+
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -64,7 +95,6 @@ var server = app.listen(app.get('port'), function () {
     debug('Express server listening on port ' + server.address().port);
 });
 
-
 // gRPC Server
 
 var PROTO_PATH = __dirname + '/protos/helloworld.proto';
@@ -83,7 +113,7 @@ var packageDefinition = protoLoader.loadSync(
     });
 var hello_proto = grpc.loadPackageDefinition(packageDefinition).helloworld;
 
-var gRPCport = process.env.PORT || 8181
+var portgRPC = process.env.portHttp2 || 8383
 
 /**
  * Implements the SayHello RPC method.
@@ -101,13 +131,12 @@ function main() {
     server.addService(hello_proto.Greeter.service, { sayHello: sayHello });
     // server.bindAsync('0.0.0.0:50051', grpc.ServerCredentials.createInsecure(), () => {
     //   server.start();
-    server.bindAsync('0.0.0.0:8181', grpc.ServerCredentials.createInsecure(), () => {
-        console.log('gRPC server listening on ${gRPCport}')
+    server.bindAsync(`0.0.0.0:${portgRPC}`, grpc.ServerCredentials.createInsecure(), () => {
+        console.log(`gRPC server listening on ${portgRPC}`)
         server.start();
-
-
-
+   
     });
+
 }
 
 main();
