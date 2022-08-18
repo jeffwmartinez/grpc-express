@@ -20,35 +20,25 @@ The client app will open a console app and respond with the text "Greeting: Hell
 ##### Deploying to App Service
 Now that it's tested locally, you can deploy the application to App Service.  Create a web app using the following directions in this [How-To](https://github.com/Azure/app-service-linux-docs/blob/master/HowTo/gRPC/use_gRPC_with_dotnet.md#deploy-to-app-service) to enable gRPC calls.
 
+tl;dr
+1. Add the app setting HTTP20_ONLY_PORT = 8383
+2. In General Settings, set HTTP version = 2.0
+3. In General Settings, set HTTP 2.0 Proxy = On
+
 Once it's deployed, you can replace the listening port in the local client application with the azurewebsites.net url to test the deployed grpc server.
 
 ### Issues/Logs
-1. Once deployed, the azurewebsites url shows an HTTP 415 error "This page isn't working right now"
-2. However, the log stream application logs shows that the gRPC server is listening on 8383
+1. The index.pug view isn't showing up when deployed to App Service.  Once deployed, the azurewebsites url shows an HTTP 415 error "This page isn't working right now".  However, the gRPC server is started and will respond to a client call.  
 
-```
-{"timestamp":"2022-07-07T03:49:00.700304508Z","level":"INFO","machineName":"pl0sdlwk000CV9","containerName":"my-node-grpc-express-app_0_7a6c511a","message":" gRPC server listening on 8383\n","id":"f6fe9160-ff04-4206-983e-67c5423a2f68","instance":"7d541a8f0aa7702237eea8e36b3c0321166514fdfef681b7755b6e82339b42dd"}
-```
+```json
+{"timestamp":"2022-08-18T05:36:58.884820029Z","level":"ERROR","machineName":"RD00155DAE3E80","containerName":"grpc-node-express_1_5bc48533","message":" npm info it worked if it ends with ok\n","id":"6a2ba2cd-ee05-4243-b674-178f3f79195c","instance":"93ad2e7cf8572308af1ea47b5a6125d6b6778911630249caca8d58ef84d9937b"}
 
-3. Platform logs show container exposed at 8383
+{"timestamp":"2022-08-18T05:36:58.893674007Z","level":"ERROR","machineName":"RD00155DAE3E80","containerName":"grpc-node-express_1_5bc48533","message":" npm info using npm@6.14.15\n","id":"40532eed-7af9-483d-95e2-cebd4ffe9f44","instance":"93ad2e7cf8572308af1ea47b5a6125d6b6778911630249caca8d58ef84d9937b"}
 
-```
-{"timestamp":"2022-07-07T03:48:51.414Z","level":"INFO","containerName":"my-node-grpc-express-app_0_7a6c511a","machineName":"pl0sdlwk000CV9","message":"docker run -d --expose=8080 --expose=8383 --name my-node-grpc-express-app_0_7a6c511a -e WEBSITE_SITE_NAME=my-node-grpc-express-app -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=my-node-grpc-express-app.azurewebsites.net -e WEBSITE_INSTANCE_ID=7d541a8f0aa7702237eea8e36b3c0321166514fdfef681b7755b6e82339b42dd -e HTTP_LOGGING_ENABLED=1 -e WEBSITE_USE_DIAGNOSTIC_SERVER=True appsvc/node:16-lts_20220309.1 \n","id":"fdeecfd5-c82f-4597-b4ff-73da09e51a3b","instance":"7d541a8f0aa7702237eea8e36b3c0321166514fdfef681b7755b6e82339b42dd"}
-```
+{"timestamp":"2022-08-18T05:36:58.893702507Z","level":"ERROR","machineName":"RD00155DAE3E80","containerName":"grpc-node-express_1_5bc48533","message":" npm info using node@v16.14.2\n","id":"1b0d23bb-fb54-410f-87f0-999edf1397d7","instance":"93ad2e7cf8572308af1ea47b5a6125d6b6778911630249caca8d58ef84d9937b"}
 
-```
-{"timestamp":"2022-07-07T03:49:01.825Z","level":"INFO","containerName":"my-node-grpc-express-app_0_7a6c511a","machineName":"pl0sdlwk000CV9","message":"Container my-node-grpc-express-app_0_7a6c511a for site my-node-grpc-express-app initialized successfully and is ready to serve requests.","id":"5a3b36ff-639e-412e-87d9-9118f4394614","instance":"7d541a8f0aa7702237eea8e36b3c0321166514fdfef681b7755b6e82339b42dd"}
-```
+{"timestamp":"2022-08-18T05:36:59.591546035Z","level":"ERROR","machineName":"RD00155DAE3E80","containerName":"grpc-node-express_1_5bc48533","message":" npm info lifecycle express-app1@0.0.0~prestart: express-app1@0.0.0\n","id":"974ed6e7-5750-413e-ba09-d6a1b9631363","instance":"93ad2e7cf8572308af1ea47b5a6125d6b6778911630249caca8d58ef84d9937b"}
 
-4. When trying to call make a call from the client - message undefined
-
-```
-TypeError: Cannot read property 'message' of undefined
-    at Object.callback (C:\Users\jefmarti\source\repos\grpc_node\grpc-client-node\grpc-client-node\app.js:37:43)
-    at Object.onReceiveStatus (C:\Users\jefmarti\source\repos\grpc_node\grpc-client-node\node_modules\?[4m@grpc?[24m\grpc-js\build\src\client.js:189:36)
-    at Object.onReceiveStatus (C:\Users\jefmarti\source\repos\grpc_node\grpc-client-node\node_modules\?[4m@grpc?[24m\grpc-js\build\src\client-interceptors.js:365:141)
-    at Object.onReceiveStatus (C:\Users\jefmarti\source\repos\grpc_node\grpc-client-node\node_modules\?[4m@grpc?[24m\grpc-js\build\src\client-interceptors.js:328:181)
-    at C:\Users\jefmarti\source\repos\grpc_node\grpc-client-node\node_modules\?[4m@grpc?[24m\grpc-js\build\src\call-stream.js:187:78
-?[90m    at processTicksAndRejections (internal/process/task_queues.js:77:11)?[39m
+{"timestamp":"2022-08-18T05:36:59.651538862Z","level":"ERROR","machineName":"RD00155DAE3E80","containerName":"grpc-node-express_1_5bc48533","message":" npm info lifecycle express-app1@0.0.0~start: express-app1@0.0.0\n","id":"6e032075-d94e-4ae6-8558-d6d76d69e711","instance":"93ad2e7cf8572308af1ea47b5a6125d6b6778911630249caca8d58ef84d9937b"}
 ```
 
